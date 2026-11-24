@@ -1,0 +1,8 @@
+dist/
+src/.env
+.env
+
+preprocess/**/__pycache__/
+preprocess/*.py[oc]
+preprocess/.venv
+

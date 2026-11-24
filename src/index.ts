@@ -28,6 +28,7 @@ export async function getResponseByID(idValue: number) {
         .select()
         .from(surveyTable)
         .where(eq(surveyTable.survey_id, idValue));
+    console.log("rows:", result.length, result);
     return result;
 }
 

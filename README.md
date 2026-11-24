@@ -21,18 +21,54 @@
 - Tests
     - API Endpoints
         - [x] POST /api/survey (receive from view)
-        - [ ] GET /api/survey/:id (lookup survey by ID)
-        - [ ] GET /api/export (get .csv to send to XMDrive)
-        - [ ] GET /api/stats (daily reports)
-        - [ ] GET /api/health (for providers)
+        - [x] GET /api/survey/:id (lookup survey by ID)
+        - [x] GET /api/export (get .csv to send to XMDrive)
+        - [x] GET /api/stats (daily reports)
+        - [x] GET /api/health (for providers)
+
     - [x] error-handling middleware needed to for audit logs in express
 
-    - [ ] Supertest for app.ts, asserting access-log per requests with 
+    - [x] Supertest for app.ts, asserting access-log per requests with 
     correct audit events (valid/invalid)
-    - [ ] Logger.test, select mocks for auditlogs
+    - [x] Logger.test, select mocks for auditlogs
 
-- [ ] pyspark valijdation
-- [ ] vue frontend 
+- Pyspark valijdation
+    - [x] Create responses_synthetic.csv
+        - ≥30 rows
+        - Include a few duplicates (same response_id twice)
+        - Include a few invalid ratings (Gd, Excellent, empty)
+        - Realistic mix of Good/OK/Poor
+
+    - [ ] Manual trace of Table 2 (written, in report)
+        - List excluded records and why (r11 Gd invalid; r07 duplicate)
+        - Map output pairs (rating, 1)
+        - Shuffle/grouped values
+        - Reduce output: Good=5, OK=3, Poor=2, Total=10
+        - Verify totals (12 − 2 excluded = 10)
+
+    - [x] Manual count of the ≥30-row CSV (spreadsheet or by hand)
+        - Write down the Good/OK/Poor totals
+        - by `analysis.py`
+
+    - [ ] Write scripts/ratings_job.py (PySpark local mode)
+        - [x] master("local[*]")
+        - [x] Filter rating IN ('Good','OK','Poor')
+        - dropDuplicates(["response_id"])
+        - groupBy("rating").count()
+
+    - Run the script and capture output (counts.show())
+
+    - Verify: Spark output == manual count. If not, find why (duplicates? whitespace? case?)
+
+    - Screenshot/paste code + input excerpt + output + verification into appendix
+
+- Write the four explanations (~300-400 words):
+    - What partitions are
+    - Why Spark generally replaced Hadoop MapReduce
+    - Why single-machine doesn't show distributed benefit
+    - Whether Company A needs distributed processing at Table 1 scale (answer: no, and why
+
+- [ ] vue frontend
     - input survey
 
 - [ ] /api/export scheduled job to upload to XMDrive

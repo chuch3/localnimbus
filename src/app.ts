@@ -14,14 +14,6 @@ const app = express();
 app.use(requestLogger);
 app.use(express.json());
 
-app.get("/", (req: Request, res: Response) => {
-    res.send("Hello World!");
-});
-
-// TODO:
-// - [ ] Error middleware to forward/next error modularly without manual logs
-// - [ ] Test each api endpoints
-
 app.post("/api/survey", async (req: Request, res: Response) => {
     const ipHash = hashIp(req);
     const parsed = createSurveySchema.safeParse(req.body);
@@ -148,12 +140,12 @@ app.get("/api/survey/:id", async (req: Request, res: Response) => {
         return res.json(rows[0]);
     } catch (err) {
         await logEvent({
-            action: "SURVEY_CREATED",
+            action: "SURVEY_LOOKUP",
             outcome: "failure",
-            detail: `DB insert failed: ${(err as Error).message}`,
+            detail: `DB lookup failed: ${(err as Error).message}`,
             ipHash,
         });
-        return res.status(500).json({ error: "Failed to save response" });
+        return res.status(500).json({ error: "Failed to lookup reponse" });
     }
 });
 
@@ -188,7 +180,7 @@ app.get("/api/stats", async (req: Request, res: Response) => {
         return res.json({ days: [...days.values()] });
     } catch (err) {
         await logEvent({
-            action: "SURVEY_LOOKOUT",
+            action: "STATS_VIEWED",
             outcome: "failure",
             detail: `Stats lookout failed: ${(err as Error).message}`,
             ipHash,

@@ -1,0 +1,21 @@
+[project]
+name = "preprocess"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "chuch3", email = "polychch3@gmail.com" }
+]
+requires-python = ">=3.11.12"
+dependencies = [
+    "numpy>=2.4.6",
+    "pandas>=3.1.1",
+    "pyspark>=4.3.0",
+]
+
+[project.scripts]
+preprocess = "preprocess:main"
+
+[build-system]
+requires = ["uv_build>=0.13.7,<0.14.0"]
+build-backend = "uv_build"
