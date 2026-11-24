@@ -1,8 +1,13 @@
+# Build output
 dist/
-src/.env
+**/dist/
+
+# Environment variables
 .env
+src/.env
 
-preprocess/**/__pycache__/
-preprocess/*.py[oc]
-preprocess/.venv
-
+# Python cache and virtual environment
+**/__pycache__/
+*.py[cod]
+.venv/
+**/.venv/
