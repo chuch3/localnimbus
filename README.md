@@ -1,8 +1,112 @@
-# Cloud Fullstack Typescript Project
+# LocalNimbus
 
-> Database first, then API endpoints
+> A full-stack survey platform built with a TypeScript/Express API, a Vue frontend, audit logging, CSV export for XMDrive, and a PySpark validation layer for distributed data processing concepts.
 
-### TODO
+---
+
+## Overview
+
+This project is a survey collection platform that accepts ratings, stores them persistently, logs every request for auditability, and exports responses as CSV for daily reporting. It is built for cloud-native architecture where the local implementation demonstrates the database -> API -> frontend stack, while the cloud design proposes how the same system would scale using managed hosting, object storage, and scheduled jobs.
+
+---
+
+## Features
+
+- **Survey intake**: accepts `Good`, `OK`, `Poor`; rejects anything else.
+- **Persistent storage**: valid responses survive app restarts (SQLite locally).
+- **Audit logging**: every request/action recorded in 1–2 sentences with action, outcome, and timestamp.
+- **CSV export**: stored responses exported and uploaded to XMDrive / `box.xmu.edu.my` as a shared daily report.
+- **Daily stats**: `/api/stats` endpoint for reporting.
+- **Health check**: `/api/health` for provider monitoring.
+- **PySpark validation**: a local-mode job that filters, deduplicates, and counts ratings, verified against a manual trace.
+
+---
+
+## Architecture
+
+```
+┌─────────────────┐
+│   Vue Frontend  │  TypeScript
+└────────┬────────┘
+         │ HTTP
+┌────────▼────────┐
+│ Express Backend │  TypeScript (HTTP handling only)
+└────────┬────────┘
+         │ Drizzle ORM
+┌────────▼────────┐
+│   PostgreSQL    │  (PSQL)
+└─────────────────┘
+```
+
+**Architectural Layers:**
+
+1. **Database**: PSQL, accessed via Drizzle ORM.
+2. **Express backend**: TypeScript, responsible only for HTTP handling.
+3. **Frontend**: Vue framework
+
+### Data Models
+**Survey**
+
+| Field | Description |
+|-------|-------------|
+| `id` | Unique identifier |
+| `rating` | `Good` / `OK` / `Poor` |
+| `name` | Respondent name |
+| `date created` | Timestamp |
+
+**Log**
+
+| Field | Description |
+|-------|-------------|
+| `id` | Unique identifier |
+| `action` | e.g. `SENT` |
+| `details` | e.g. `sending cum` |
+| `date created` | Timestamp |
+
+
+---
+
+## API Endpoints
+
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| `POST` | `/api/survey` | Receive a survey submission from the view |
+| `GET` | `/api/survey/:id` | Look up a survey by ID |
+| `GET` | `/api/export` | Get `.csv` to send to XMDrive |
+| `GET` | `/api/stats` | Daily reports |
+| `GET` | `/api/health` | Health check for providers |
+
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Database | PostgreSQL (PSQL) |
+| ORM | Drizzle ORM |
+| Backend | TypeScript + Express |
+| Frontend | TypeScript + Vue |
+| Data preprocessing | PySpark (local mode) |
+| Concepts explored | GFS · MapReduce · BigQuery |
+
+
+---
+
+## 🧪 Tests
+
+| Test | Coverage |
+|------|----------|
+| API endpoints | `POST /api/survey`, `GET /api/survey/:id`, `GET /api/export`, `GET /api/stats`, `GET /api/health` |
+| `Supertest` (`app.ts`) | Asserts access-log per request with correct audit events (valid/invalid) |
+| `Logger.test` | Select mocks for `auditlogs` |
+| Error-handling middleware | Ensures failed requests are captured in audit logs |
+
+---
+
+## Todo 
+
+- Need more innovation or write on your own 
+    - [ ] implement the old HDFS & Hive server 
+    - [ ] /api/export allow change of upload size for XMDrive
 
 - [x] crud logic index.ts
 - [x] server audit logs & response logs
@@ -32,6 +136,18 @@
     correct audit events (valid/invalid)
     - [x] Logger.test, select mocks for auditlogs
 
+- /api/export Scheduled job when exporting .csv to XMDrive
+    - [ ] manually upload daily report csv
+
+- [ ] Database authorization
+    - [source](https://www.grizzlypeaksoftware.com/library/expressjs-middleware-patterns-authentication-and-authorization-e0hbci84) 
+- [ ] vue frontend
+    - input survey
+    - output survey received
+    - database page to login and interact with APIs
+
+- [ ] Firebase Setup
+
 - Pyspark valijdation
     - [x] Create responses_synthetic.csv
         - ≥30 rows
@@ -50,28 +166,23 @@
         - Write down the Good/OK/Poor totals
         - by `analysis.py`
 
-    - [ ] Write scripts/ratings_job.py (PySpark local mode)
+    - [x] Write scripts/ratings_job.py (PySpark local mode)
         - [x] master("local[*]")
         - [x] Filter rating IN ('Good','OK','Poor')
-        - dropDuplicates(["response_id"])
-        - groupBy("rating").count()
+        - [x] dropDuplicates(["response_id"])
+        - [x] groupBy("rating").count()
 
-    - Run the script and capture output (counts.show())
+    - [ ] Run the script and capture output (counts.show())
 
-    - Verify: Spark output == manual count. If not, find why (duplicates? whitespace? case?)
+    - [ ] Verify: Spark output == manual count. If not, find why (duplicates? whitespace? case?)
 
-    - Screenshot/paste code + input excerpt + output + verification into appendix
+    - [ ] Screenshot/paste code + input excerpt + output + verification into appendix
 
-- Write the four explanations (~300-400 words):
+- [ ] Write the four explanations (~300-400 words):
     - What partitions are
     - Why Spark generally replaced Hadoop MapReduce
     - Why single-machine doesn't show distributed benefit
     - Whether Company A needs distributed processing at Table 1 scale (answer: no, and why
-
-- [ ] vue frontend
-    - input survey
-
-- [ ] /api/export scheduled job to upload to XMDrive
 
 ### Learning debt
 
@@ -81,60 +192,36 @@
 - logger.ts
 - app.ts
 
-### Issues
+
+---
+
+## License
+
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+
+Copyright (c) 2026 chch
 
 
-### Future 
-
-- Authorization/database
-- Cloud proivder/solutions
-
-### Requirements
-
-- [x]  Accept rating (Good, ok, poor), reject other value 
-- Saved valid response still present after app stopped and restarted (SQLite database / csv)
-    - Just store locally on the user database
-- Record request / application logs in 1/2 sentence (ex: python logging module)
-- export stored response to .csv and upload to XMDrive or box.xmu.edu.my as shared copy for daily report
-
-### Architecture
-
-- Survey 
-    - rating 
-    - name
-    - date created
-    - id
-
-- Log 
-    - action "SENT, etc"
-    - details "sending cum" 
-    - date created
-    - id
-
-Layer 1: database
-Layer 2: express backend 
-Layer 3: frontend
-
-### Tooling 
-
-- Dataset PSQL  
-
-- Drizzle ORM 
-
-- Typescript backend, 
-    - GET 	
-    - POST 	
-    - PUT 
-    - DELETE 
-
-- Typescript frontend
-    - Vue framework 
-
-- PySpark data preprocessing
-
-> GFS, MapReduce, Bigquery
 
 
-- Write a cloud deployment plan for the platform you recommended in Part B-I, identifying the proposed hosting service, storage service, configuration steps, access controls, and monitoring approach, and how the service would handle the campaign peak in Table 1. 
 
-- Explain what would replace your local storage and the manual XMDrive upload in the cloud design. Clearly distinguish the features you demonstrated locally from those you only propose for the cloud.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

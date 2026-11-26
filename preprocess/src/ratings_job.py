@@ -16,15 +16,11 @@ def main():
     df = df.drop_duplicates(["response_id"])
     df = df.groupBy("rating").count().orderBy("rating")
 
-    print("===== Rating counts =====")
+    print("===== Final Rating Counts =====")
     df.show()
 
-    # total = counts.agg(F.sum("count").alias("total")).collect()[0]["total"]
-    # print(f"Total valid unique responses: {total}")
-
-    # result = {row["rating"]: row["count"] for row in counts.collect()}
-    # for r in ["Good", "OK", "Poor"]:
-    #     print(f"  {r}: {result.get(r, 0)}")
+    total = df.agg(F.sum("count").alias("total")).collect()[0]["total"]
+    print(f"Total valid unique responses: {total}")
 
     spark.stop()
 
