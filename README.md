@@ -1,14 +1,12 @@
 # LocalNimbus
 
-> A full-stack survey platform built with a TypeScript/Express API, a Vue frontend, audit logging, CSV export for XMDrive, and a PySpark validation layer for distributed data processing concepts.
+A full-stack survey platform built with a TypeScript/Express API, a Vue frontend, audit logging, CSV export for XMDrive, and a PySpark validation layer for distributed data processing concepts.
 
 ---
 
 ## Overview
 
 This project is a survey collection platform that accepts ratings, stores them persistently, logs every request for auditability, and exports responses as CSV for daily reporting. It is built for cloud-native architecture where the local implementation demonstrates the database -> API -> frontend stack, while the cloud design proposes how the same system would scale using managed hosting, object storage, and scheduled jobs.
-
----
 
 ## Features
 
@@ -19,8 +17,6 @@ This project is a survey collection platform that accepts ratings, stores them p
 - **Daily stats**: `/api/stats` endpoint for reporting.
 - **Health check**: `/api/health` for provider monitoring.
 - **PySpark validation**: a local-mode job that filters, deduplicates, and counts ratings, verified against a manual trace.
-
----
 
 ## Architecture
 
@@ -91,7 +87,7 @@ This project is a survey collection platform that accepts ratings, stores them p
 
 ---
 
-## 🧪 Tests
+## Tests
 
 | Test | Coverage |
 |------|----------|
@@ -100,7 +96,6 @@ This project is a survey collection platform that accepts ratings, stores them p
 | `Logger.test` | Select mocks for `auditlogs` |
 | Error-handling middleware | Ensures failed requests are captured in audit logs |
 
----
 
 ## Todo 
 
@@ -192,36 +187,8 @@ This project is a survey collection platform that accepts ratings, stores them p
 - logger.ts
 - app.ts
 
-
----
-
 ## License
 
 This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
 
 Copyright (c) 2026 chch
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
